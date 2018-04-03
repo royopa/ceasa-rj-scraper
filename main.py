@@ -3,6 +3,16 @@ import csv
 from requests_html import HTMLSession
 import wget
 import os
+from tqdm import tqdm
+import requests
+
+
+def download_file(url, file_name):
+    response = requests.get(url, stream=True)
+    with open(file_name, "wb") as handle:
+        for data in tqdm(response.iter_content()):
+            handle.write(data)
+    handle.close()
 
 
 def download_pdfs():
@@ -16,12 +26,12 @@ def download_pdfs():
             list_cleaned.append(url[0])
     
     for url in list_cleaned:
-        name_file = url.split('/')[-1]
+        name_file = url.split('=')[-1]
         print(name_file)
         path_file = os.path.join('downloads', name_file)
 
         if not os.path.exists(path_file):
-            wget.download(url, path_file)
+            download_file(url, path_file)
 
 
 def get_link_planilhas(pagina):
